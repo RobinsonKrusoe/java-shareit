@@ -1,24 +1,19 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.dto;
 
 import lombok.Builder;
 import lombok.Data;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.Email;
 
 /**
- * Класс пользователя
+ * Класс для отображении данных о пользователе
  */
 @Data
 @Builder
-public class User {
-    @NotNull
-    private long id;        //уникальный идентификатор пользователя
-
-    @NotNull
+public class UserDto {
+    private Long id;        //уникальный идентификатор пользователя
     private String name;    //имя или логин пользователя
-
-    @NotNull
-    @Email
+    @Email(message = "Некорректный Email!")
     private String email;   //адрес электронной почты
                             //(два пользователя не могут иметь одинаковый адрес электронной почты).
 }
