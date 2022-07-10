@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.service;
 
+import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.Collection;
@@ -16,7 +17,7 @@ public interface UserService {
     /**
      * Получение пользователя п идентификатору
      */
-    UserDto get(long id);
+    User get(long id);
 
     /**
      * Получение всех пользователей
@@ -26,7 +27,7 @@ public interface UserService {
     /**
      * Обновление пользователя
      */
-    UserDto upd(UserDto user);
+    UserDto patch(UserDto user);
 
     /**
      * Удаление пользователя

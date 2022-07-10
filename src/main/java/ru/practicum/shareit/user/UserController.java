@@ -1,7 +1,6 @@
 package ru.practicum.shareit.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
@@ -15,9 +14,9 @@ import java.util.Collection;
 @RestController
 @RequestMapping(path = "/users")
 public class UserController {
-    private UserService userService;
+    private final UserService userService;
     @Autowired
-    public UserController(@Qualifier("inMemoryUserServiceImpl") UserService userService) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
@@ -34,7 +33,7 @@ public class UserController {
      */
     @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable long userId){
-        return userService.get(userId);
+        return UserMapper.toUserDto(userService.get(userId));
     }
 
     /**
@@ -53,7 +52,7 @@ public class UserController {
     public UserDto patchUser(@Valid @RequestBody UserDto user,
                            @PathVariable long userId){
         user.setId(userId);
-        return userService.upd(user);
+        return userService.patch(user);
     }
 
     /**

@@ -13,7 +13,7 @@ import java.util.*;
 
 @Component
 @RequiredArgsConstructor
-public class inMemoryUserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService {
     Map<Long, User> users = new HashMap<>();
     long iter = 1;
     @Override
@@ -26,16 +26,16 @@ public class inMemoryUserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto get(long id) {
+    public User get(long id) {
         if(users.containsKey(id)){
-            return UserMapper.toUserDto(users.get(id));
+            return users.get(id);
         }else {
             throw new EntityNotFoundException("Пользователь не существует!");
         }
     }
 
     @Override
-    public UserDto upd(UserDto user) {
+    public UserDto patch(UserDto user) {
         User userInBase = null;
         if(users.containsKey(user.getId())){
             userInBase = users.get(user.getId());

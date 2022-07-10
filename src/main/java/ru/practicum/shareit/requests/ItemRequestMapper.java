@@ -7,7 +7,7 @@ public class ItemRequestMapper {
         return ItemRequestDto.builder()
                 .id(itemRequest.getId())
                 .description(itemRequest.getDescription())
-                .requestor(itemRequest.getRequestor())
+                .requestor(itemRequest.getRequestor().getId())
                 .created(itemRequest.getCreated())
                 .build();
     }

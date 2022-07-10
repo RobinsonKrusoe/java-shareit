@@ -15,9 +15,9 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/items")
 public class ItemController {
-    private ItemService itemService;
+    private final ItemService itemService;
     @Autowired
-    public ItemController(@Qualifier("inMemoryItemServiceImpl") ItemService itemService) {
+    public ItemController(@Qualifier("itemServiceImpl") ItemService itemService) {
         this.itemService = itemService;
     }
 
@@ -42,7 +42,7 @@ public class ItemController {
     public ItemDto patchItem(@Valid @RequestBody ItemDto item,
                              @PathVariable Long itemId,
                              @RequestHeader("X-Sharer-User-Id") Long userId){
-        return itemService.upd(item, itemId, userId);
+        return itemService.patch(item, itemId, userId);
     }
 
     /**

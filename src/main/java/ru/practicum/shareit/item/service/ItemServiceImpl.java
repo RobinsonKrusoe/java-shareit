@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.errorHandle.exception.AccessForbiddenException;
 import ru.practicum.shareit.errorHandle.exception.EntityNotFoundException;
@@ -10,20 +9,20 @@ import ru.practicum.shareit.errorHandle.exception.ValidationException;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.*;
 
 @Component
 @RequiredArgsConstructor
-public class InMemoryItemServiceImpl implements ItemService {
+public class ItemServiceImpl implements ItemService {
     private UserService userService;
-    private Map<Long, Item> items = new HashMap<>();
+    private final Map<Long, Item> items = new HashMap<>();
     private long iter = 1;
 
     @Autowired
-    public InMemoryItemServiceImpl(@Qualifier("inMemoryUserServiceImpl") UserService userService) {
+    public ItemServiceImpl(UserService userService) {
         this.userService = userService;
     }
 
@@ -34,7 +33,7 @@ public class InMemoryItemServiceImpl implements ItemService {
      */
     @Override
     public ItemDto add(ItemDto item, long userId) {
-        userService.get(userId);
+        User user = userService.get(userId);
         if(item.getAvailable() == null){
             throw new ValidationException("Не заполнено поле доступности!");
         }
@@ -48,7 +47,7 @@ public class InMemoryItemServiceImpl implements ItemService {
 
         item.setId(iter++);
         Item itemForBase = ItemMapper.toItem(item);
-        itemForBase.setOwner(userId);
+        itemForBase.setOwner(user);
         items.put(itemForBase.getId(), itemForBase);
         return item;
     }
@@ -74,7 +73,7 @@ public class InMemoryItemServiceImpl implements ItemService {
     public Collection<ItemDto> getAllUserItems(long userId) {
         List<ItemDto> ret = new ArrayList<>();
         for (Item item : items.values()) {
-            if(item.getOwner() == userId){
+            if(item.getOwner().getId() == userId){
                 ret.add(ItemMapper.toItemDto(item));
             }
         }
@@ -109,8 +108,8 @@ public class InMemoryItemServiceImpl implements ItemService {
      * @param item вещь
      */
     @Override
-    public ItemDto upd(ItemDto item, Long itemId, Long userId) {
-        UserDto user = userService.get(userId);
+    public ItemDto patch(ItemDto item, Long itemId, Long userId) {
+        User user = userService.get(userId);
 
         if(!items.containsKey(itemId)){
             throw new EntityNotFoundException("Вещь с идентификатором" + itemId + " не найдена!");
@@ -118,7 +117,7 @@ public class InMemoryItemServiceImpl implements ItemService {
 
         Item itemInBase = items.get(itemId);
 
-        if(itemInBase.getOwner() != userId){
+        if(itemInBase.getOwner().getId() != userId){
             throw new AccessForbiddenException("Можно вносить изменения только в свои вещи!");
         }
 
@@ -150,7 +149,7 @@ public class InMemoryItemServiceImpl implements ItemService {
 
         Item itemInBase = items.get(id);
 
-        if(itemInBase.getOwner() != userId){
+        if(itemInBase.getOwner().getId() != userId){
             throw new AccessForbiddenException("Можно удалять только свои вещи!");
         }
 

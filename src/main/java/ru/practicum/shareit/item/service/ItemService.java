@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.service;
 
-import org.springframework.web.bind.annotation.RequestParam;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.Collection;
@@ -40,7 +39,7 @@ public interface ItemService {
      * Обновление вещи
      * @param item вещь
      */
-    ItemDto upd(ItemDto item, Long itemId, Long userId);
+    ItemDto patch(ItemDto item, Long itemId, Long userId);
 
     /**
      * Удаление вещи
