@@ -17,7 +17,7 @@ import java.util.Collection;
 public class ItemController {
     private final ItemService itemService;
     @Autowired
-    public ItemController(@Qualifier("itemServiceImpl") ItemService itemService) {
+    public ItemController(ItemService itemService) {
         this.itemService = itemService;
     }
 
