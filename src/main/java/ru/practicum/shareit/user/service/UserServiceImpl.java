@@ -7,6 +7,7 @@ import ru.practicum.shareit.errorHandle.exception.EntityNotFoundException;
 import ru.practicum.shareit.errorHandle.exception.ValidationException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserMapper;
+import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.*;
@@ -14,21 +15,28 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    Map<Long, User> users = new HashMap<>();
-    long iter = 1;
+    private final UserRepository repository;
+
     @Override
     public UserDto add(UserDto user) {
-        user.setId(iter);
         User userToIns = UserMapper.toUser(user);
+
         checkEmail(userToIns);
-        users.put(iter++, userToIns);
-        return user;
+
+        userToIns = repository.saveAndFlush(UserMapper.toUser(user));
+
+        return UserMapper.toUserDto(userToIns);
     }
 
     @Override
-    public User get(long id) {
-        if(users.containsKey(id)){
-            return users.get(id);
+    public UserDto getDto(long id) {
+        return UserMapper.toUserDto(getUser(id));
+    }
+    @Override
+    public User getUser(long id) {
+        Optional<User> user = repository.findById(id);
+        if(user.isPresent()){
+            return user.get();
         }else {
             throw new EntityNotFoundException("Пользователь не существует!");
         }
@@ -36,26 +44,30 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto patch(UserDto user) {
-        User userInBase = null;
-        if(users.containsKey(user.getId())){
-            userInBase = users.get(user.getId());
+        Optional<User> userInBase = null;
+        if (user != null && user.getId() != null){
+            userInBase = repository.findById(user.getId());
+        }
+
+        if(userInBase.isPresent()){
             if(user.getName() != null){
-                userInBase.setName(user.getName());
+                userInBase.get().setName(user.getName());
             }
             if(user.getEmail() != null){
                 checkEmail(UserMapper.toUser(user));
-                userInBase.setEmail(user.getEmail());
+                userInBase.get().setEmail(user.getEmail());
             }
+            repository.save(userInBase.get());
         }else {
             throw new EntityNotFoundException("Попытка обновления несуществующего пользователя!");
         }
-        return UserMapper.toUserDto(userInBase);
+        return UserMapper.toUserDto(userInBase.get());
     }
 
     @Override
     public void del(long id) {
-        if(users.containsKey(id)){
-            users.remove(id);
+        if(repository.existsById(id)){
+            repository.deleteById(id);
         }else {
             throw new EntityNotFoundException("Попытка удаления несуществующего пользователя!");
         }
@@ -63,7 +75,7 @@ public class UserServiceImpl implements UserService {
 
     public Collection<UserDto> getAll(){
         List<UserDto> ret = new ArrayList<>();
-        for (User u : users.values()) {
+        for (User u : repository.findAll()) {
             ret.add(UserMapper.toUserDto(u));
         }
         return ret;
@@ -71,12 +83,7 @@ public class UserServiceImpl implements UserService {
 
     private void checkEmail(User user){
         if(user.getEmail() == null){
-            throw  new ValidationException("Email не может быть пустым!");
-        }
-        for (User u : users.values()) {
-            if(u.getId() != user.getId() && user.getEmail().equals(u.getEmail())){
-                throw new EntityAlreadyExistException("Пользователь с Email " + user.getEmail() + " уже существует!");
-            }
+            throw new ValidationException("Email не может быть пустым!");
         }
     }
 }
