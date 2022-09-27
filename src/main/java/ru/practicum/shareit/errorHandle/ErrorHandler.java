@@ -30,7 +30,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException(final ValidationException e) {
-        return new ErrorResponse(String.format("Validation Failed: %s", e.getMessage()));
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
@@ -48,6 +48,6 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleThrowable(final Throwable e) {
-        return new ErrorResponse("Произошла непредвиденная ошибка!");
+        return new ErrorResponse("Произошла непредвиденная ошибка! " + e.getMessage());
     }
 }

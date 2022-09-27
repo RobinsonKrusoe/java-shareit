@@ -1,9 +1,10 @@
 package ru.practicum.shareit.item;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.service.CommentService;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
@@ -16,9 +17,13 @@ import java.util.Collection;
 @RequestMapping("/items")
 public class ItemController {
     private final ItemService itemService;
+    private final CommentService commentService;
+
     @Autowired
-    public ItemController(ItemService itemService) {
+    public ItemController(ItemService itemService,
+                          CommentService commentService) {
         this.itemService = itemService;
+        this.commentService = commentService;
     }
 
     /**
@@ -50,8 +55,10 @@ public class ItemController {
      * Информацию о вещи может просмотреть любой пользователь.
      */
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable long itemId){
-        return itemService.get(itemId);
+    public ItemDto getItemById(@PathVariable long itemId,
+                               @RequestHeader("X-Sharer-User-Id") long userId){
+        ItemDto ret = itemService.getDto(itemId, userId);
+        return ret;
     }
 
     /**
@@ -79,5 +86,20 @@ public class ItemController {
     public void deleteItem(@RequestHeader("X-Sharer-User-Id") long userId,
                            @PathVariable long itemId) {
         itemService.del(itemId, userId);
+    }
+
+    /**
+     * Добавление комментария к вещи
+     * POST /items/{itemId}/comment
+     * @param commentDto
+     * @param itemId
+     * @param userId
+     * @return
+     */
+    @PostMapping("/{itemId}/comment")
+    public CommentDto postItem(@Valid @RequestBody CommentDto commentDto,
+                               @PathVariable long itemId,
+                               @RequestHeader("X-Sharer-User-Id") long userId){
+        return commentService.add(commentDto, itemId, userId);
     }
 }

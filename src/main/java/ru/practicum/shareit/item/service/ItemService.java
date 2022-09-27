@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Item;
 
 import java.util.Collection;
 
@@ -12,21 +13,22 @@ public interface ItemService {
      * Добавление новой вещи
      * @param item вещь
      */
-    ItemDto add(ItemDto item, long userId);
+    ItemDto add(ItemDto item, Long userId);
 
     /**
      * Получение вещи по идентификатору
      * @param id идентификатор вещи
      * @return вещь
      */
-    ItemDto get(long id);
+    ItemDto getDto(Long id, Long userId);
+    Item getItem(Long id);
 
     /**
      * Получение всех вещей пользователя
      * @param userId пользоаптнль
      * @return вещи
      */
-    Collection<ItemDto> getAllUserItems(long userId);
+    Collection<ItemDto> getAllUserItems(Long userId);
 
     /**
      * Поиск вещи по тексту в названии или описании
@@ -43,7 +45,7 @@ public interface ItemService {
 
     /**
      * Удаление вещи
-     * @param id идентификатор вещи
+     * @param itemId идентификатор вещи
      */
-    void del(long id, long userId);
+    void del(Long itemId, Long userId);
 }
