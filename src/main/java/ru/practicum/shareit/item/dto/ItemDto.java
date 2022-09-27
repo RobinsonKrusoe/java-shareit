@@ -21,14 +21,14 @@ public class ItemDto {
     private UserDto owner;          //владелец вещи;
     private ItemRequestDto request; //если вещь была создана по запросу другого пользователя, то в этом поле будет храниться
                                     //ссылка на соответствующий запрос.
-    private Booking lastBooking;
-    private Booking nextBooking;
+    private BookingIner lastBooking;
+    private BookingIner nextBooking;
 
     private Collection<CommentDto> comments;
 
     @Data
     @AllArgsConstructor
-    public static class Booking{
+    public static class BookingIner {
         private Long id;
         private Long bookerId;
     }

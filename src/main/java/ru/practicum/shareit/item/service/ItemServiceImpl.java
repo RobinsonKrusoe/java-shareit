@@ -176,19 +176,19 @@ public class ItemServiceImpl implements ItemService {
         itemRepository.deleteById(id);
     }
 
-    private ItemDto.Booking getLastBooking(Long itemId){
+    private ItemDto.BookingIner getLastBooking(Long itemId){
         Object[] o = itemRepository.findLastBooking(itemId, Date.from(Instant.now())).get(0);
         if(o[0]!= null && o[1]!= null){
-            return new ItemDto.Booking(Long.valueOf(o[0].toString()), Long.valueOf(o[1].toString()));
+            return new ItemDto.BookingIner(Long.valueOf(o[0].toString()), Long.valueOf(o[1].toString()));
         } else {
             return null;
         }
     }
 
-    private ItemDto.Booking getNextBooking(Long itemId){
+    private ItemDto.BookingIner getNextBooking(Long itemId){
         Object[] o = itemRepository.findNextBooking(itemId, Date.from(Instant.now())).get(0);
         if(o[0]!= null && o[1]!= null){
-            return new ItemDto.Booking(Long.valueOf(o[0].toString()), Long.valueOf(o[1].toString()));
+            return new ItemDto.BookingIner(Long.valueOf(o[0].toString()), Long.valueOf(o[1].toString()));
         } else {
             return null;
         }

@@ -54,13 +54,14 @@ public class BookingServiceImpl implements BookingService {
         if(bookingInDto.getStart() == null ||
            bookingInDto.getEnd() == null ||
            bookingInDto.getStart().after(bookingInDto.getEnd()) ||
-           bookingInDto.getStart().before(new Date())
-        ){
+           bookingInDto.getStart().before(new Date())){
             throw new ValidationException("Заданы некорректные даты бронирования!");
         }
 
         if(!item.isAvailable() ||
-           bookingRepository.isBooked(bookingInDto.getItemId(), bookingInDto.getStart(), bookingInDto.getEnd()) > 0){
+           bookingRepository.isBooked(bookingInDto.getItemId(),
+                                      bookingInDto.getStart(),
+                                      bookingInDto.getEnd()) > 0){
             throw new ValidationException("Вещь не доступна к бронированию!");
         }
 
@@ -137,10 +138,33 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Collection<BookingDto> findUserBookings(String state, long userId) {
         User user = userService.getUser(userId);
-        checkStatus(state);
+        BookingSearchStatus searchStatus = null;
+        List<Booking> bookingList = new ArrayList<>();
+
+        try{
+            searchStatus = BookingSearchStatus.valueOf(state);
+        } catch (IllegalArgumentException e){
+            throw new ValidationException("Unknown state: " + state);
+        }
+        switch(searchStatus){
+            case ALL:
+                bookingList = bookingRepository.findAllByBooker_IdOrderByStartDesc(userId);
+                break;
+            case PAST:
+                bookingList = bookingRepository.findAllByBooker_IdAndStartBeforeOrderByStartDesc(userId, new Date());
+                break;
+            case FUTURE:
+                bookingList = bookingRepository.findAllByBooker_IdAndStartAfterOrderByStartDesc(userId, new Date());
+                break;
+            case CURRENT:
+                bookingList = bookingRepository.findAllByBooker_IdAndStartOrderByStartDesc(userId, new Date());
+                break;
+            case WAITING: case REJECTED:
+                bookingList = bookingRepository.findAllByBooker_IdAndStatus_OrderByStartDesc(userId, state);
+        }
 
         List<BookingDto> ret = new ArrayList<>();
-        for (Booking booking :bookingRepository.findUserBookings(userId, state)) {
+        for (Booking booking : bookingList){
             ret.add(BookingMapper.toBookingDto(booking));
         }
         return ret;
@@ -156,10 +180,34 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Collection<BookingDto> findOwnerBookings(String state, long userId) {
         User user = userService.getUser(userId);
-        checkStatus(state);
+        BookingSearchStatus searchStatus = null;
+        List<Booking> bookingList = new ArrayList<>();
+
+        try{
+            searchStatus = BookingSearchStatus.valueOf(state);
+        } catch (IllegalArgumentException e){
+            throw new ValidationException("Unknown state: " + state);
+        }
+
+        switch(searchStatus){
+            case ALL:
+                bookingList = bookingRepository.findAllByItem_Owner_IdOrderByStartDesc(userId);
+                break;
+            case PAST:
+                bookingList = bookingRepository.findAllByItem_Owner_IdAndStartBeforeOrderByStartDesc(userId, new Date());
+                break;
+            case FUTURE:
+                bookingList = bookingRepository.findAllByItem_Owner_IdAndStartAfterOrderByStartDesc(userId, new Date());
+                break;
+            case CURRENT:
+                bookingList = bookingRepository.findAllByItem_Owner_IdAndStartOrderByStartDesc(userId, new Date());
+                break;
+            case WAITING: case REJECTED:
+                bookingList = bookingRepository.findAllByItem_Owner_IdAndStatus_OrderByStartDesc(userId, state);
+        }
 
         List<BookingDto> ret = new ArrayList<>();
-        for (Booking booking : bookingRepository.findOwnerBookings(userId, state)){
+        for (Booking booking : bookingList){
             ret.add(BookingMapper.toBookingDto(booking));
         }
         return ret;
@@ -171,13 +219,5 @@ public class BookingServiceImpl implements BookingService {
                 bookerId,
                 BookingStatus.APPROVED,
                 new Date());
-    }
-
-    private void checkStatus(String state){
-        try{
-            BookingSearchStatus checkStatus = BookingSearchStatus.valueOf(state);
-        } catch (IllegalArgumentException e){
-            throw new ValidationException("Unknown state: " + state);
-        }
     }
 }

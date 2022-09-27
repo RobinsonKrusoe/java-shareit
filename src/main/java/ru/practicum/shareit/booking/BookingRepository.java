@@ -12,32 +12,17 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByBooker_IdAndEndIsBefore(Long bookerId, LocalDateTime end);
 
-    @Query(value = " select * from bookings b " +
-                   " where b.booker_id = ?1 " +
-                   " and (?2 = 'ALL' or " +
-                        " ?2 = b.status or" +
-                        " ?2 = case " +
-                                "when start_date > current_date then 'FUTURE' " +
-                                "when end_date < current_date then 'PAST' " +
-                                "when current_date between start_date and end_date then 'CURRENT' " +
-                              "end) " +
-                   " order by b.start_date desc",
-           nativeQuery = true)
-    List<Booking> findUserBookings(Long bookerId, String status);
+    List<Booking> findAllByBooker_IdOrderByStartDesc(Long bookerId);
+    List<Booking> findAllByBooker_IdAndStartAfterOrderByStartDesc(Long bookerId, Date date);
+    List<Booking> findAllByBooker_IdAndStartBeforeOrderByStartDesc(Long bookerId, Date date);
+    List<Booking> findAllByBooker_IdAndStartOrderByStartDesc(Long bookerId, Date date);
+    List<Booking> findAllByBooker_IdAndStatus_OrderByStartDesc(Long bookerId, String status);
 
-    @Query(value = " select * from bookings b, items i " +
-                   " where b.item_id = i.id " +
-                   " and i.owner_id = ?1 " +
-                   " and (?2 = 'ALL' or" +
-                        " ?2 = b.status or" +
-                        " ?2 = case " +
-                                "when start_date > current_date then 'FUTURE' " +
-                                "when end_date < current_date then 'PAST' " +
-                                "when current_date between start_date and end_date then 'CURRENT' " +
-                              "end) " +
-                  " order by b.start_date desc",
-            nativeQuery = true)
-    List<Booking> findOwnerBookings(Long ownerId, String status);
+    List<Booking> findAllByItem_Owner_IdOrderByStartDesc(Long ownerId);
+    List<Booking> findAllByItem_Owner_IdAndStartAfterOrderByStartDesc(Long ownerId, Date date);
+    List<Booking> findAllByItem_Owner_IdAndStartBeforeOrderByStartDesc(Long ownerId, Date date);
+    List<Booking> findAllByItem_Owner_IdAndStartOrderByStartDesc(Long ownerId, Date date);
+    List<Booking> findAllByItem_Owner_IdAndStatus_OrderByStartDesc(Long ownerId, String status);
 
     @Query(value = " select count(*) from bookings " +
                    " where item_id = ?1 " +
