@@ -2,7 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.errorHandle.exception.EntityAlreadyExistException;
+
 import ru.practicum.shareit.errorHandle.exception.EntityNotFoundException;
 import ru.practicum.shareit.errorHandle.exception.ValidationException;
 import ru.practicum.shareit.user.User;
@@ -32,12 +32,13 @@ public class UserServiceImpl implements UserService {
     public UserDto getDto(long id) {
         return UserMapper.toUserDto(getUser(id));
     }
+
     @Override
     public User getUser(long id) {
         Optional<User> user = repository.findById(id);
-        if(user.isPresent()){
+        if (user.isPresent()) {
             return user.get();
-        }else {
+        } else {
             throw new EntityNotFoundException("Пользователь не существует!");
         }
     }
@@ -45,20 +46,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto patch(UserDto user) {
         Optional<User> userInBase = null;
-        if (user != null && user.getId() != null){
+        if (user != null && user.getId() != null) {
             userInBase = repository.findById(user.getId());
         }
 
-        if(userInBase.isPresent()){
-            if(user.getName() != null){
+        if (userInBase.isPresent()) {
+            if (user.getName() != null) {
                 userInBase.get().setName(user.getName());
             }
-            if(user.getEmail() != null){
+            if (user.getEmail() != null) {
                 checkEmail(UserMapper.toUser(user));
                 userInBase.get().setEmail(user.getEmail());
             }
             repository.save(userInBase.get());
-        }else {
+        } else {
             throw new EntityNotFoundException("Попытка обновления несуществующего пользователя!");
         }
         return UserMapper.toUserDto(userInBase.get());
@@ -66,14 +67,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void del(long id) {
-        if(repository.existsById(id)){
+        if (repository.existsById(id)) {
             repository.deleteById(id);
-        }else {
+        } else {
             throw new EntityNotFoundException("Попытка удаления несуществующего пользователя!");
         }
     }
 
-    public Collection<UserDto> getAll(){
+    public Collection<UserDto> getAll() {
         List<UserDto> ret = new ArrayList<>();
         for (User u : repository.findAll()) {
             ret.add(UserMapper.toUserDto(u));
@@ -81,8 +82,8 @@ public class UserServiceImpl implements UserService {
         return ret;
     }
 
-    private void checkEmail(User user){
-        if(user.getEmail() == null){
+    private void checkEmail(User user) {
+        if (user.getEmail() == null) {
             throw new ValidationException("Email не может быть пустым!");
         }
     }

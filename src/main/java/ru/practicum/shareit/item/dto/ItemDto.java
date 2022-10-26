@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.requests.dto.ItemRequestDto;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.Collection;
@@ -19,16 +18,16 @@ public class ItemDto {
     private String description;     //развёрнутое описание;
     private Boolean available;      //статус о том, доступна или нет вещь для аренды;
     private UserDto owner;          //владелец вещи;
-    private ItemRequestDto request; //если вещь была создана по запросу другого пользователя, то в этом поле будет храниться
+    private Long requestId;         //если вещь была создана по запросу другого пользователя, то в этом поле будет храниться
                                     //ссылка на соответствующий запрос.
-    private BookingIner lastBooking;
-    private BookingIner nextBooking;
+    private Booking lastBooking;
+    private Booking nextBooking;
 
     private Collection<CommentDto> comments;
 
     @Data
     @AllArgsConstructor
-    public static class BookingIner {
+    public static class Booking {
         private Long id;
         private Long bookerId;
     }

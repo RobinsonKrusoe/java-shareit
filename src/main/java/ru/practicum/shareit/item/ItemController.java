@@ -34,7 +34,7 @@ public class ItemController {
      */
     @PostMapping
     public ItemDto postItem(@Valid @RequestBody ItemDto item,
-                         @RequestHeader("X-Sharer-User-Id") long userId){
+                         @RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.add(item, userId);
     }
 
@@ -46,7 +46,7 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemDto patchItem(@Valid @RequestBody ItemDto item,
                              @PathVariable Long itemId,
-                             @RequestHeader("X-Sharer-User-Id") Long userId){
+                             @RequestHeader("X-Sharer-User-Id") Long userId) {
         return itemService.patch(item, itemId, userId);
     }
 
@@ -56,7 +56,7 @@ public class ItemController {
      */
     @GetMapping("/{itemId}")
     public ItemDto getItemById(@PathVariable long itemId,
-                               @RequestHeader("X-Sharer-User-Id") long userId){
+                               @RequestHeader("X-Sharer-User-Id") long userId) {
         ItemDto ret = itemService.getDto(itemId, userId);
         return ret;
     }
@@ -65,8 +65,10 @@ public class ItemController {
      * Просмотр владельцем списка всех его вещей с указанием названия и описания для каждой.
      */
     @GetMapping
-    public Collection<ItemDto> getAllUserItems(@RequestHeader("X-Sharer-User-Id") long userId){
-        return itemService.getAllUserItems(userId);
+    public Collection<ItemDto> getAllUserItems(@RequestParam(defaultValue = "0",required = false) Integer from,
+                                               @RequestParam(defaultValue = "10",required = false) Integer size,
+                                               @RequestHeader("X-Sharer-User-Id") long userId) {
+        return itemService.getAllUserItems(userId, from, size);
     }
 
     /**
@@ -75,8 +77,10 @@ public class ItemController {
      * и система ищет вещи, содержащие этот текст в названии или описании.
      */
     @GetMapping("/search")
-    public Collection<ItemDto> searchItems(@RequestParam String text){
-        return itemService.searchItems(text);
+    public Collection<ItemDto> searchItems(@RequestParam(defaultValue = "0",required = false) Integer from,
+                                           @RequestParam(defaultValue = "10",required = false) Integer size,
+                                           @RequestParam String text) {
+        return itemService.searchItems(text, from, size);
     }
 
     /**
@@ -99,7 +103,7 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     public CommentDto postItem(@Valid @RequestBody CommentDto commentDto,
                                @PathVariable long itemId,
-                               @RequestHeader("X-Sharer-User-Id") long userId){
+                               @RequestHeader("X-Sharer-User-Id") long userId) {
         return commentService.add(commentDto, itemId, userId);
     }
 }

@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.errorHandle.exception.AccessForbiddenException;
 import ru.practicum.shareit.errorHandle.exception.EntityNotFoundException;
@@ -9,6 +11,7 @@ import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.requests.service.ItemRequestService;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -18,15 +21,18 @@ import java.util.*;
 @Component
 public class ItemServiceImpl implements ItemService {
     private final UserService userService;
+    private final ItemRequestService requestService;
     private final ItemRepository itemRepository;
 
     private final CommentService commentService;
 
     @Autowired
     public ItemServiceImpl(UserService userService,
+                           ItemRequestService requestService,
                            ItemRepository itemRepository,
                            CommentService commentService) {
         this.userService = userService;
+        this.requestService = requestService;
         this.itemRepository = itemRepository;
         this.commentService = commentService;
     }
@@ -39,19 +45,22 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto add(ItemDto itemDto, Long userId) {
         User owner = userService.getUser(userId);
-        if(itemDto.getAvailable() == null){
+        if (itemDto.getAvailable() == null) {
             throw new ValidationException("Не заполнено поле доступности!");
         }
-        if(itemDto.getName() == null || itemDto.getName().isBlank()){
+        if (itemDto.getName() == null || itemDto.getName().isBlank()) {
             throw new ValidationException("Не заполнено название вещи!");
         }
 
-        if(itemDto.getDescription() == null || itemDto.getDescription().isBlank()){
+        if (itemDto.getDescription() == null || itemDto.getDescription().isBlank()) {
             throw new ValidationException("Не заполнено описание вещи!");
         }
 
         Item itemForBase = ItemMapper.toItem(itemDto);
         itemForBase.setOwner(owner);
+        if (itemDto.getRequestId() != null) {
+            itemForBase.setRequest(requestService.getItemRequest(itemDto.getRequestId()));
+        }
 
         itemForBase = itemRepository.saveAndFlush(itemForBase);
 
@@ -68,7 +77,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto getDto(Long itemId, Long userId) {
         ItemDto itemDto = ItemMapper.toItemDto(getItem(itemId));
         // Если запрашивает хозяин вещи - добавить информацию о бронированиях
-        if (itemDto.getOwner() != null && itemDto.getOwner().getId() == userId){
+        if (itemDto.getOwner() != null && itemDto.getOwner().getId().equals(userId)) {
             itemDto.setLastBooking(getLastBooking(itemId));
             itemDto.setNextBooking(getNextBooking(itemId));
         }
@@ -81,12 +90,13 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item getItem(Long itemId) {
         Optional<Item> item = itemRepository.findById(itemId);
-        if(item.isPresent()){
+        if (item.isPresent()) {
             return item.get();
-        }else {
-            throw new EntityNotFoundException("Вещь с идентификатором" + itemId + " не найдена!");
+        } else {
+            throw new EntityNotFoundException("Вещь с идентификатором " + itemId + " не найдена!");
         }
     }
+
     /**
      * Получение всех вещей пользователя
      *
@@ -94,10 +104,14 @@ public class ItemServiceImpl implements ItemService {
      * @return вещи
      */
     @Override
-    public Collection<ItemDto> getAllUserItems(Long userId) {
+    public List<ItemDto> getAllUserItems(Long userId, Integer from, Integer size) {
+        if (from < 0 || size < 0) {
+            throw new ValidationException("Параметры частичной выдачи результата не могут быть отрицательными!");
+        }
         List<ItemDto> ret = new ArrayList<>();
+        Pageable pagingSet = PageRequest.of(from, size);
         ItemDto itemDto = null;
-        for (Item item : itemRepository.findItemsByOwnerIdOrderById(userId)) {
+        for (Item item : itemRepository.findItemsByOwnerIdOrderById(userId, pagingSet)) {
             itemDto = ItemMapper.toItemDto(item);
             itemDto.setLastBooking(getLastBooking(item.getId()));
             itemDto.setNextBooking(getNextBooking(item.getId()));
@@ -116,13 +130,26 @@ public class ItemServiceImpl implements ItemService {
      * @return найденные вещи
      */
     @Override
-    public Collection<ItemDto> searchItems(String text) {
+    public List<ItemDto> searchItems(String text, Integer from, Integer size) {
+        if (from < 0 || size < 0) {
+            throw new ValidationException("Параметры частичной выдачи результата не могут быть отрицательными!");
+        }
         List<ItemDto> ret = new ArrayList<>();
+        Pageable pagingSet = PageRequest.of(from, size);
 
-        if(text != null && !text.isBlank()){
-            for (Item item : itemRepository.search(text)) {
+        if (text != null && !text.isBlank()) {
+            for (Item item : itemRepository.search(text, pagingSet)) {
                 ret.add(ItemMapper.toItemDto(item));
             }
+        }
+        return ret;
+    }
+
+    @Override
+    public List<ItemDto> searchItemsByRequest(Long requestId) {
+        List<ItemDto> ret = new ArrayList<>();
+        for (Item item : itemRepository.findAllByRequest_Id(requestId)) {
+            ret.add(ItemMapper.toItemDto(item));
         }
         return ret;
     }
@@ -136,19 +163,19 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto patch(ItemDto itemDto, Long itemId, Long userId) {
         Item itemInBase = getItem(itemId);
 
-        if(itemInBase.getOwner().getId() != userId){
+        if (itemInBase.getOwner().getId() != userId) {
             throw new AccessForbiddenException("Можно вносить изменения только в свои вещи!");
         }
 
-        if(itemDto.getName() != null){
+        if (itemDto.getName() != null) {
             itemInBase.setName(itemDto.getName());
         }
 
-        if(itemDto.getDescription() != null){
+        if (itemDto.getDescription() != null) {
             itemInBase.setDescription(itemDto.getDescription());
         }
 
-        if(itemDto.getAvailable() != null){
+        if (itemDto.getAvailable() != null) {
             itemInBase.setAvailable(itemDto.getAvailable());
         }
 
@@ -165,30 +192,30 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public void del(Long id, Long userId) {
         Optional<Item> item = itemRepository.findById(id);
-        if(!item.isPresent()){
+        if (!item.isPresent()) {
             throw new EntityNotFoundException("Вещь с идентификатором" + id + " не найдена!");
         }
 
-        if(item.get().getOwner().getId() != userId){
+        if (item.get().getOwner().getId() != userId) {
             throw new AccessForbiddenException("Можно удалять только свои вещи!");
         }
 
         itemRepository.deleteById(id);
     }
 
-    private ItemDto.BookingIner getLastBooking(Long itemId){
+    private ItemDto.Booking getLastBooking(Long itemId) {
         Object[] o = itemRepository.findLastBooking(itemId, Date.from(Instant.now())).get(0);
-        if(o[0]!= null && o[1]!= null){
-            return new ItemDto.BookingIner(Long.valueOf(o[0].toString()), Long.valueOf(o[1].toString()));
+        if (o[0] != null && o[1] != null) {
+            return new ItemDto.Booking(Long.valueOf(o[0].toString()), Long.valueOf(o[1].toString()));
         } else {
             return null;
         }
     }
 
-    private ItemDto.BookingIner getNextBooking(Long itemId){
+    private ItemDto.Booking getNextBooking(Long itemId) {
         Object[] o = itemRepository.findNextBooking(itemId, Date.from(Instant.now())).get(0);
-        if(o[0]!= null && o[1]!= null){
-            return new ItemDto.BookingIner(Long.valueOf(o[0].toString()), Long.valueOf(o[1].toString()));
+        if (o[0] != null && o[1] != null) {
+            return new ItemDto.Booking(Long.valueOf(o[0].toString()), Long.valueOf(o[1].toString()));
         } else {
             return null;
         }

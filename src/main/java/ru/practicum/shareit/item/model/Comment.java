@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "comments")
@@ -21,12 +21,17 @@ public class Comment {
     private String text;        //содержимое комментария
 
     @ManyToOne
-    @JoinColumn(name="item_id")
+    @JoinColumn(name = "item_id")
     private Item item;          //вещь, к которой относится комментарий
 
     @ManyToOne
-    @JoinColumn(name="author_id")
+    @JoinColumn(name = "author_id")
     private User author;        //автор комментария
 
-    private Date created;       //дата создания комментария
+    private LocalDateTime created;       //дата создания комментария
+
+    @PrePersist
+    protected void onCreate() {
+        created = LocalDateTime.now();
+    }
 }

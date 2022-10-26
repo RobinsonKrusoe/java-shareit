@@ -13,9 +13,9 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.service.UserService;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 @Component
@@ -50,16 +50,16 @@ public class CommentServiceImpl implements CommentService {
         Item item = itemService.getItem(itemId);
         User booker = userService.getUser(userId);
 
-        if(commentDto.getText() == null || commentDto.getText().isEmpty()){
+        if (commentDto.getText() == null || commentDto.getText().isEmpty()) {
             throw new ValidationException("Комментарий не может быть пустым!");
         }
 
         //Проверка что автор арендовал комментируемый товар
-        if (!bookingService.checkBooker(itemId, userId)){
+        if (!bookingService.checkBooker(itemId, userId)) {
             throw new ValidationException("Оставлять комментарии может только арендатор по завершении аренды!");
         }
 
-        comment.setCreated(new Date());
+        comment.setCreated(LocalDateTime.now());
         comment.setItem(item);
         comment.setAuthor(booker);
 
@@ -71,7 +71,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Collection<CommentDto> findItemComments(Long itemId) {
         List<CommentDto> ret = new ArrayList<>();
-        for(Comment comment : commentRepository.findAllByItem_Id(itemId)){
+        for (Comment comment : commentRepository.findAllByItem_Id(itemId)) {
             ret.add(CommentMapper.toCommentDto(comment));
         }
         return ret;

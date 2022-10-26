@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * Класс представления для бронирования вещи (входящий вариант)
@@ -14,7 +14,7 @@ import java.util.Date;
 public class BookingInDto {
     private Long itemId;    //уникальный идентификатор бронирования;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private Date start;     //дата начала бронирования;
+    private LocalDateTime  start;     //дата начала бронирования;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private Date end;       //дата конца бронирования;
+    private LocalDateTime end;       //дата конца бронирования;
 }
