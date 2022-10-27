@@ -105,9 +105,6 @@ public class ItemServiceImpl implements ItemService {
      */
     @Override
     public List<ItemDto> getAllUserItems(Long userId, Integer from, Integer size) {
-        if (from < 0 || size < 0) {
-            throw new ValidationException("Параметры частичной выдачи результата не могут быть отрицательными!");
-        }
         List<ItemDto> ret = new ArrayList<>();
         Pageable pagingSet = PageRequest.of(from, size);
         ItemDto itemDto = null;
@@ -131,9 +128,6 @@ public class ItemServiceImpl implements ItemService {
      */
     @Override
     public List<ItemDto> searchItems(String text, Integer from, Integer size) {
-        if (from < 0 || size < 0) {
-            throw new ValidationException("Параметры частичной выдачи результата не могут быть отрицательными!");
-        }
         List<ItemDto> ret = new ArrayList<>();
         Pageable pagingSet = PageRequest.of(from, size);
 

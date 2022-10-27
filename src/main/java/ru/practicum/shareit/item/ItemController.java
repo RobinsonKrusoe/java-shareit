@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -8,12 +9,15 @@ import ru.practicum.shareit.item.service.CommentService;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 
 /**
  * Контроллер для обработки запросов по вещам
  */
 @RestController
+@Validated
 @RequestMapping("/items")
 public class ItemController {
     private final ItemService itemService;
@@ -65,9 +69,12 @@ public class ItemController {
      * Просмотр владельцем списка всех его вещей с указанием названия и описания для каждой.
      */
     @GetMapping
-    public Collection<ItemDto> getAllUserItems(@RequestParam(defaultValue = "0",required = false) Integer from,
-                                               @RequestParam(defaultValue = "10",required = false) Integer size,
-                                               @RequestHeader("X-Sharer-User-Id") long userId) {
+    public Collection<ItemDto> getAllUserItems(
+            @PositiveOrZero(message = "From должно быть положительным числом или 0")
+            @RequestParam(defaultValue = "0",required = false) Integer from,
+            @Positive(message = "Size должно быть положительным числом")
+            @RequestParam(defaultValue = "10",required = false) Integer size,
+            @RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.getAllUserItems(userId, from, size);
     }
 
@@ -77,9 +84,12 @@ public class ItemController {
      * и система ищет вещи, содержащие этот текст в названии или описании.
      */
     @GetMapping("/search")
-    public Collection<ItemDto> searchItems(@RequestParam(defaultValue = "0",required = false) Integer from,
-                                           @RequestParam(defaultValue = "10",required = false) Integer size,
-                                           @RequestParam String text) {
+    public Collection<ItemDto> searchItems(
+            @PositiveOrZero(message = "From должно быть положительным числом или 0")
+            @RequestParam(defaultValue = "0",required = false) Integer from,
+            @Positive(message = "Size должно быть положительным числом")
+            @RequestParam(defaultValue = "10",required = false) Integer size,
+            @RequestParam String text) {
         return itemService.searchItems(text, from, size);
     }
 

@@ -1,13 +1,17 @@
 package ru.practicum.shareit.requests;
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.requests.dto.ItemRequestDto;
 import ru.practicum.shareit.requests.service.ItemRequestService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 
 @RestController
+@Validated
 @RequestMapping(path = "/requests")
 public class ItemRequestController {
     private final ItemRequestService itemRequestService;
@@ -47,9 +51,12 @@ public class ItemRequestController {
      * для отображения.
      */
     @GetMapping("/all")
-    public Collection<ItemRequestDto> getOthersItemRequests(@RequestParam(defaultValue = "0",required = false) Integer from,
-                                                            @RequestParam(defaultValue = "10",required = false) Integer size,
-                                                            @RequestHeader("X-Sharer-User-Id") long userId) {
+    public Collection<ItemRequestDto> getOthersItemRequests(
+            @PositiveOrZero(message = "From должно быть положительным числом или 0")
+            @RequestParam(defaultValue = "0",required = false) Integer from,
+            @Positive(message = "Size должно быть положительным числом")
+            @RequestParam(defaultValue = "10",required = false) Integer size,
+            @RequestHeader("X-Sharer-User-Id") long userId) {
         return itemRequestService.getOthers(userId, from, size);
     }
 

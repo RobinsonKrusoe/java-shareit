@@ -1,18 +1,22 @@
 package ru.practicum.shareit.booking;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingInDto;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 
 /**
  * Контроллер для работы с бронированиями
  */
 @RestController
+@Validated
 @RequestMapping(path = "/bookings")
 public class BookingController {
     private final BookingService bookingService;
@@ -71,10 +75,17 @@ public class BookingController {
      * Бронирования должны возвращаться отсортированными по дате от более новых к более старым.
      */
     @GetMapping
-    public Collection<BookingDto> findUserBookings(@RequestParam(defaultValue = "0",required = false) Integer from,
-                                                   @RequestParam(defaultValue = "10",required = false) Integer size,
-                                                   @RequestParam(defaultValue = "ALL", required = false) String state,
-                                                   @RequestHeader("X-Sharer-User-Id") long userId) {
+    public Collection<BookingDto> findUserBookings(
+            @RequestParam(defaultValue = "0",required = false)
+            @PositiveOrZero(message = "From должно быть положительным числом или 0")
+                Integer from,
+            @RequestParam(defaultValue = "10",required = false)
+            @Positive(message = "Size должно быть положительным числом")
+                Integer size,
+            @RequestParam(defaultValue = "ALL", required = false)
+                String state,
+            @RequestHeader("X-Sharer-User-Id")
+                long userId) {
         return bookingService.findUserBookings(state, userId, from, size);
     }
 
@@ -85,10 +96,17 @@ public class BookingController {
      * Работа параметра state аналогична его работе в предыдущем сценарии.
      */
     @GetMapping("/owner")
-    public Collection<BookingDto> findOwnerBookings(@RequestParam(defaultValue = "0",required = false) Integer from,
-                                                    @RequestParam(defaultValue = "10",required = false) Integer size,
-                                                    @RequestParam(defaultValue = "ALL", required = false) String state,
-                                                    @RequestHeader("X-Sharer-User-Id") long userId) {
+    public Collection<BookingDto> findOwnerBookings(
+            @RequestParam(defaultValue = "0",required = false)
+            @PositiveOrZero(message = "From должно быть положительным числом или 0")
+                Integer from,
+            @RequestParam(defaultValue = "10",required = false)
+            @Positive(message = "Size должно быть положительным числом")
+                Integer size,
+            @RequestParam(defaultValue = "ALL", required = false)
+                String state,
+            @RequestHeader("X-Sharer-User-Id")
+                long userId) {
         return bookingService.findOwnerBookings(state, userId, from, size);
     }
 }

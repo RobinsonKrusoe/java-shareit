@@ -140,9 +140,6 @@ public class BookingServiceImpl implements BookingService {
      */
     @Override
     public Collection<BookingDto> findUserBookings(String state, long userId, Integer from, Integer size) {
-        if (from < 0 || size < 1) {
-            throw new ValidationException("Некорректные параметры частичной выдачи результата!");
-        }
         User user = userService.getUser(userId);
         BookingSearchStatus searchStatus = null;
         Pageable pagingSet = PageRequest.of(from / size, size);
@@ -192,9 +189,6 @@ public class BookingServiceImpl implements BookingService {
      */
     @Override
     public Collection<BookingDto> findOwnerBookings(String state, long userId, Integer from, Integer size) {
-        if (from < 0 || size < 1) {
-            throw new ValidationException("Некорректные параметры частичной выдачи результата!");
-        }
         User user = userService.getUser(userId);
         BookingSearchStatus searchStatus = null;
         Pageable pagingSet = PageRequest.of(from / size, size);

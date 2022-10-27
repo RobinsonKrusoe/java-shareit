@@ -169,8 +169,8 @@ class ItemServiceImplTest {
                 .build();
 
         //Некорректные параметры порции данных должны вызывать исключение
-        assertThrows(ValidationException.class, () -> itemService.getAllUserItems(1L, -1, 1));
-        assertThrows(ValidationException.class, () -> itemService.getAllUserItems(1L, 0, -1));
+        assertThrows(IllegalArgumentException.class, () -> itemService.getAllUserItems(1L, -1, 1));
+        assertThrows(IllegalArgumentException.class, () -> itemService.getAllUserItems(1L, 0, -1));
 
         assertEquals(List.of(itemDtoOne, itemDtoTwo), itemService.getAllUserItems(1L, 0, 1));
     }
@@ -194,8 +194,8 @@ class ItemServiceImplTest {
                 .build();
 
         //Некорректные параметры порции данных должны вызывать исключение
-        assertThrows(ValidationException.class, () -> itemService.searchItems("test", -1, 1));
-        assertThrows(ValidationException.class, () -> itemService.searchItems("test", 0, -1));
+        assertThrows(IllegalArgumentException.class, () -> itemService.searchItems("test", -1, 1));
+        assertThrows(IllegalArgumentException.class, () -> itemService.searchItems("test", 0, -1));
 
         assertEquals(List.of(itemDtoOne, itemDtoTwo), itemService.searchItems("test", 0, 1));
     }

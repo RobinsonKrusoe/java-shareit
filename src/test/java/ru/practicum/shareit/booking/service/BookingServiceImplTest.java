@@ -204,10 +204,10 @@ class BookingServiceImplTest {
                 .thenReturn(new PageImpl<>(List.of(booking)));
 
         //Некорректные параметры порции данных должны вызывать исключение
-        assertThrows(ValidationException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> bookingService.findUserBookings("ALL", 1L, -1, 1));
 
-        assertThrows(ValidationException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> bookingService.findUserBookings("ALL", 1L, 0, -1));
 
 
@@ -236,10 +236,10 @@ class BookingServiceImplTest {
                 .thenReturn(new PageImpl<>(List.of(booking)));
 
         //Некорректные параметры порции данных должны вызывать исключение
-        assertThrows(ValidationException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> bookingService.findOwnerBookings("ALL", 1L, -1, 1));
 
-        assertThrows(ValidationException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> bookingService.findOwnerBookings("ALL", 1L, 0, -1));
 
         //Некорректный статус должен вызывать исключение

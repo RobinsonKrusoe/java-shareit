@@ -110,9 +110,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
      */
     @Override
     public List<ItemRequestDto> getOthers(Long userId, Integer from, Integer size) {
-        if (from < 0 || size < 0) {
-            throw new ValidationException("Параметры частичной выдачи результата не могут быть отрицательными!");
-        }
         Pageable pagingSet = PageRequest.of(from, size);
         List<ItemRequestDto> ret = new ArrayList<>();
         ItemRequestDto itemRequestDto = null;

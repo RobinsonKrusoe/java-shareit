@@ -126,8 +126,8 @@ class ItemRequestServiceImplTest {
     @Test
     void getOthers() {
         //Некорректные параметры порции данных должны вызывать исключение
-        assertThrows(ValidationException.class, () -> itemRequestService.getOthers(2L, -1, 1));
-        assertThrows(ValidationException.class, () -> itemRequestService.getOthers(2L, 0, -1));
+        assertThrows(IllegalArgumentException.class, () -> itemRequestService.getOthers(2L, -1, 1));
+        assertThrows(IllegalArgumentException.class, () -> itemRequestService.getOthers(2L, 0, -1));
 
         assertEquals(List.of(itemRequestDto), itemRequestService.getOthers(2L, 0, 1));
     }
