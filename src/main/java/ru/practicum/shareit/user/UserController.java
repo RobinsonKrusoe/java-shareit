@@ -15,6 +15,7 @@ import java.util.Collection;
 @RequestMapping(path = "/users")
 public class UserController {
     private final UserService userService;
+
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
@@ -24,7 +25,7 @@ public class UserController {
      * Создание пользователя
      */
     @PostMapping
-    public UserDto postUser(@Valid @RequestBody UserDto user){
+    public UserDto postUser(@Valid @RequestBody UserDto user) {
         return userService.add(user);
     }
 
@@ -32,7 +33,7 @@ public class UserController {
      * Чтение пользователя
      */
     @GetMapping("/{userId}")
-    public UserDto getUser(@PathVariable long userId){
+    public UserDto getUser(@PathVariable long userId) {
         return userService.getDto(userId);
     }
 
@@ -40,7 +41,7 @@ public class UserController {
      * Чтение пользователя
      */
     @GetMapping
-    public Collection<UserDto> getAllUsers(){
+    public Collection<UserDto> getAllUsers() {
         return userService.getAll();
     }
 
@@ -50,7 +51,7 @@ public class UserController {
      */
     @PatchMapping("/{userId}")
     public UserDto patchUser(@Valid @RequestBody UserDto user,
-                           @PathVariable long userId){
+                           @PathVariable long userId) {
         user.setId(userId);
         return userService.patch(user);
     }
@@ -59,7 +60,7 @@ public class UserController {
      * Улаление пользователя
      */
     @DeleteMapping("/{userId}")
-    public void delUser(@PathVariable long userId){
+    public void delUser(@PathVariable long userId) {
         userService.del(userId);
     }
 }

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -8,12 +9,15 @@ import ru.practicum.shareit.item.service.CommentService;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 
 /**
  * Контроллер для обработки запросов по вещам
  */
 @RestController
+@Validated
 @RequestMapping("/items")
 public class ItemController {
     private final ItemService itemService;
@@ -34,7 +38,7 @@ public class ItemController {
      */
     @PostMapping
     public ItemDto postItem(@Valid @RequestBody ItemDto item,
-                         @RequestHeader("X-Sharer-User-Id") long userId){
+                         @RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.add(item, userId);
     }
 
@@ -46,7 +50,7 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemDto patchItem(@Valid @RequestBody ItemDto item,
                              @PathVariable Long itemId,
-                             @RequestHeader("X-Sharer-User-Id") Long userId){
+                             @RequestHeader("X-Sharer-User-Id") Long userId) {
         return itemService.patch(item, itemId, userId);
     }
 
@@ -56,7 +60,7 @@ public class ItemController {
      */
     @GetMapping("/{itemId}")
     public ItemDto getItemById(@PathVariable long itemId,
-                               @RequestHeader("X-Sharer-User-Id") long userId){
+                               @RequestHeader("X-Sharer-User-Id") long userId) {
         ItemDto ret = itemService.getDto(itemId, userId);
         return ret;
     }
@@ -65,8 +69,13 @@ public class ItemController {
      * Просмотр владельцем списка всех его вещей с указанием названия и описания для каждой.
      */
     @GetMapping
-    public Collection<ItemDto> getAllUserItems(@RequestHeader("X-Sharer-User-Id") long userId){
-        return itemService.getAllUserItems(userId);
+    public Collection<ItemDto> getAllUserItems(
+            @PositiveOrZero(message = "From должно быть положительным числом или 0")
+            @RequestParam(defaultValue = "0",required = false) Integer from,
+            @Positive(message = "Size должно быть положительным числом")
+            @RequestParam(defaultValue = "10",required = false) Integer size,
+            @RequestHeader("X-Sharer-User-Id") long userId) {
+        return itemService.getAllUserItems(userId, from, size);
     }
 
     /**
@@ -75,8 +84,13 @@ public class ItemController {
      * и система ищет вещи, содержащие этот текст в названии или описании.
      */
     @GetMapping("/search")
-    public Collection<ItemDto> searchItems(@RequestParam String text){
-        return itemService.searchItems(text);
+    public Collection<ItemDto> searchItems(
+            @PositiveOrZero(message = "From должно быть положительным числом или 0")
+            @RequestParam(defaultValue = "0",required = false) Integer from,
+            @Positive(message = "Size должно быть положительным числом")
+            @RequestParam(defaultValue = "10",required = false) Integer size,
+            @RequestParam String text) {
+        return itemService.searchItems(text, from, size);
     }
 
     /**
@@ -99,7 +113,7 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     public CommentDto postItem(@Valid @RequestBody CommentDto commentDto,
                                @PathVariable long itemId,
-                               @RequestHeader("X-Sharer-User-Id") long userId){
+                               @RequestHeader("X-Sharer-User-Id") long userId) {
         return commentService.add(commentDto, itemId, userId);
     }
 }

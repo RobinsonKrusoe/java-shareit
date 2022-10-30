@@ -1,6 +1,6 @@
 package ru.practicum.shareit.errorHandle.exception;
 
-public class AccessForbiddenException extends RuntimeException{
+public class AccessForbiddenException extends RuntimeException {
     public AccessForbiddenException(String message) {
         super(message);
     }

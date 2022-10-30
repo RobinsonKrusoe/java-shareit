@@ -29,11 +29,11 @@ public class Item {
     private boolean available;  //статус о том, доступна или нет вещь для аренды;
 
     @ManyToOne
-    @JoinColumn(name="owner_id")
+    @JoinColumn(name = "owner_id")
     private User owner;         //владелец вещи;
 
     @ManyToOne
-    @JoinColumn(name="request_id")
+    @JoinColumn(name = "request_id")
     private ItemRequest request;//если вещь была создана по запросу другого пользователя, то в этом поле будет храниться
                                 //ссылка на соответствующий запрос.
 }

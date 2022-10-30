@@ -18,6 +18,7 @@ public interface UserService {
      * Получение пользователя п идентификатору
      */
     UserDto getDto(long id);
+
     User getUser(long id);
 
     /**

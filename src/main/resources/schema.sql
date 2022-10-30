@@ -51,8 +51,8 @@ CREATE TABLE IF NOT EXISTS comments (
   CONSTRAINT FK_COMMENT_ON_ITEM FOREIGN KEY (item_id) REFERENCES items (id)
 );
 
-truncate bookings restart identity cascade;
-truncate comments restart identity cascade;
-truncate item_requests restart identity cascade;
-truncate items restart identity cascade;
-truncate users restart identity cascade;
+--truncate bookings restart identity cascade;
+--truncate comments restart identity cascade;
+--truncate item_requests restart identity cascade;
+--truncate items restart identity cascade;
+--truncate users restart identity cascade;

@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * Класс запроса для бронирования
@@ -22,7 +22,12 @@ public class ItemRequest {
     private long id;            //уникальный идентификатор запроса;
     private String description; //текст запроса, содержащий описание требуемой вещи;
     @ManyToOne
-    @JoinColumn(name="requestor_id")
+    @JoinColumn(name = "requestor_id")
     private User requestor;     //пользователь, создавший запрос;
-    private Date created;       //дата и время создания запроса.
+    private LocalDateTime created;       //дата и время создания запроса.
+
+    @PrePersist
+    protected void onCreate() {
+        created = LocalDateTime.now();
+    }
 }

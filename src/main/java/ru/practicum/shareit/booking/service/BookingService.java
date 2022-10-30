@@ -41,7 +41,7 @@ public interface BookingService {
      * @param userId
      * @return
      */
-    Collection<BookingDto> findUserBookings(String state, long userId);
+    Collection<BookingDto> findUserBookings(String state, long userId, Integer from, Integer size);
 
     /**
      * Получение бронирований вещей пользователя
@@ -49,7 +49,7 @@ public interface BookingService {
      * @param userId
      * @return
      */
-    Collection<BookingDto> findOwnerBookings(String state, long userId);
+    Collection<BookingDto> findOwnerBookings(String state, long userId, Integer from, Integer size);
 
     /**
      * Проверка арендовал ли человек данную вещь
