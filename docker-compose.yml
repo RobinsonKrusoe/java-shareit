@@ -29,4 +29,3 @@ services:
       - POSTGRES_DB=shareit
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=123456Qaz
-      -
