@@ -1,7 +1,6 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,26 +26,26 @@ class BookingServiceImplDBTest {
     private final EntityManager em;
     private final BookingServiceImpl service;
 
-    @AfterEach
-    void afterEach() {
-        em.createNativeQuery("truncate bookings restart identity cascade");
-        em.createNativeQuery("truncate comments restart identity cascade");
-        em.createNativeQuery("truncate item_requests restart identity cascade");
-        em.createNativeQuery("truncate items restart identity cascade");
-        em.createNativeQuery("truncate users restart identity cascade");
-    }
+//    @AfterEach
+//    void afterEach() {
+//        em.createNativeQuery("truncate bookings restart identity cascade");
+//        em.createNativeQuery("truncate comments restart identity cascade");
+//        em.createNativeQuery("truncate item_requests restart identity cascade");
+//        em.createNativeQuery("truncate items restart identity cascade");
+//        em.createNativeQuery("truncate users restart identity cascade");
+//    }
 
     @Test
     void testAddDB() {
         LocalDateTime startBooking = LocalDateTime.now().plusHours(2);
         LocalDateTime endBooking = LocalDateTime.now().plusHours(24);
 
-        User userOne = new User(0L, "UserOne", "UserOne@mail.tst");
-        User userTwo = new User(0L, "UserTwo", "UserTwo@mail.tst");
+        User userOne = new User(0L, "UserBSOne", "UserBSOne@mail.tst");
+        User userTwo = new User(0L, "UserBSTwo", "UserBSTwo@mail.tst");
 
         Item item = new Item(0L,
-                "Аккумуляторная дрель",
-                "Аккумуляторная дрель + аккумулятор",
+                "Вещь для бронирования",
+                "Вещь для проверки бронирования",
                 true,
                 userOne,
                 null);
@@ -56,12 +55,12 @@ class BookingServiceImplDBTest {
         em.persist(item);
 
         BookingInDto bookingInDto = BookingInDto.builder()
-                .itemId(1L)
+                .itemId(item.getId())
                 .start(startBooking)
                 .end(endBooking)
                 .build();
 
-        BookingDto bookingDto = service.add(bookingInDto, 2L);
+        BookingDto bookingDto = service.add(bookingInDto, userTwo.getId());
 
         TypedQuery<Booking> query = em.createQuery("Select b from Booking b where b.id = :id", Booking.class);
 

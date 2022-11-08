@@ -1,7 +1,6 @@
 package ru.practicum.shareit.requests.service;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,16 +21,16 @@ class ItemRequestServiceImplDBTest {
     private final EntityManager em;
     private final ItemRequestServiceImpl service;
 
-    @AfterEach
-    void afterEach() {
-        em.createNativeQuery("truncate item_requests restart identity cascade;");
-        em.createNativeQuery("truncate items restart identity cascade");
-        em.createNativeQuery("truncate users restart identity cascade");
-    }
+//    @AfterEach
+//    void afterEach() {
+//        em.createNativeQuery("truncate item_requests restart identity cascade;");
+//        em.createNativeQuery("truncate items restart identity cascade");
+//        em.createNativeQuery("truncate users restart identity cascade");
+//    }
 
     @Test
     void testAddDB() {
-        User userOne = new User(0L, "UserOne", "UserOne@mail.tst");
+        User userOne = new User(0L, "UserIRS", "UserIRS@mail.tst");
         em.persist(userOne);
 
         ItemRequestDto itemRequestDto = ItemRequestDto.builder()
@@ -39,7 +38,7 @@ class ItemRequestServiceImplDBTest {
                 .description("Хотел бы воспользоваться аккумуляторной дрелью")
                 .build();
 
-        itemRequestDto = service.add(itemRequestDto, 1L);
+        itemRequestDto = service.add(itemRequestDto, userOne.getId());
 
         TypedQuery<ItemRequest> query = em.createQuery("Select i from ItemRequest i where i.id = :id",
                                                             ItemRequest.class);

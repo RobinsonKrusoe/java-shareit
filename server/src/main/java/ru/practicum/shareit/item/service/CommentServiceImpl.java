@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.errorHandle.exception.ValidationException;
 import ru.practicum.shareit.item.CommentMapper;

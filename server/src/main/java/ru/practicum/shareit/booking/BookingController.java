@@ -2,7 +2,6 @@ package ru.practicum.shareit.booking;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -15,7 +14,6 @@ import java.util.Collection;
  * Контроллер для работы с бронированиями
  */
 @Slf4j
-@Validated
 @RestController
 @RequestMapping(path = "/bookings")
 public class BookingController {

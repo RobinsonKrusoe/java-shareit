@@ -1,11 +1,12 @@
 package ru.practicum.shareit.booking.service;
 
-import org.hibernate.validator.internal.util.stereotypes.Lazy;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+
 import ru.practicum.shareit.booking.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingInDto;
@@ -50,15 +51,7 @@ public class BookingServiceImpl implements BookingService {
         User booker = userService.getUser(userId);
 
         if (item.getOwner().getId() == userId) {
-            //throw new ValidationException("Нельзя брать вещи в аренду у самого себя!");
-            throw new EntityNotFoundException("С какого-то перепугу, по тестам, здесь должно быть 404 а не 400!");
-        }
-
-        if (bookingInDto.getStart() == null ||
-           bookingInDto.getEnd() == null ||
-           bookingInDto.getStart().isAfter(bookingInDto.getEnd()) ||
-           bookingInDto.getStart().isBefore(LocalDateTime.now())) {
-            throw new ValidationException("Заданы некорректные даты бронирования!");
+            throw new EntityNotFoundException("Нельзя брать вещи в аренду у самого себя!");
         }
 
         if (!item.isAvailable() ||
@@ -141,16 +134,10 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Collection<BookingDto> findUserBookings(String state, long userId, Integer from, Integer size) {
         User user = userService.getUser(userId);
-        BookingSearchStatus searchStatus = null;
         Pageable pagingSet = PageRequest.of(from / size, size);
         Page<Booking> retPage = null;
 
-        try {
-            searchStatus = BookingSearchStatus.valueOf(state);
-        } catch (IllegalArgumentException e) {
-            throw new ValidationException("Unknown state: " + state);
-        }
-        switch (searchStatus) {
+        switch (BookingSearchStatus.valueOf(state)) {
             case ALL:
                 retPage = bookingRepository.findAllByBooker_IdOrderByStartDesc(userId, pagingSet);
                 break;
@@ -190,17 +177,10 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Collection<BookingDto> findOwnerBookings(String state, long userId, Integer from, Integer size) {
         User user = userService.getUser(userId);
-        BookingSearchStatus searchStatus = null;
         Pageable pagingSet = PageRequest.of(from / size, size);
         Page<Booking> retPage = null;
 
-        try {
-            searchStatus = BookingSearchStatus.valueOf(state);
-        } catch (IllegalArgumentException e) {
-            throw new ValidationException("Unknown state: " + state);
-        }
-
-        switch (searchStatus) {
+        switch (BookingSearchStatus.valueOf(state)) {
             case ALL:
                 retPage = bookingRepository.findAllByItem_Owner_IdOrderByStartDesc(userId, pagingSet);
                 break;

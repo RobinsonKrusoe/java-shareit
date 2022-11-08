@@ -34,6 +34,12 @@ public class BookingController {
 	public ResponseEntity<Object> postBooking(@RequestHeader("X-Sharer-User-Id") long userId,
 											  @Valid @RequestBody BookingInDto bookingInDto) {
 
+		if (bookingInDto.getStart() == null ||
+				bookingInDto.getEnd() == null ||
+				bookingInDto.getStart().isAfter(bookingInDto.getEnd())) {
+			throw new ValidationException("Заданы некорректные даты бронирования!");
+		}
+
 		log.info("Creating booking {}, userId={}", bookingInDto, userId);
 
 		return bookingClient.add(bookingInDto, userId);

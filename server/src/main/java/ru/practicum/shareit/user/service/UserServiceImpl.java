@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import ru.practicum.shareit.errorHandle.exception.EntityNotFoundException;
-import ru.practicum.shareit.errorHandle.exception.ValidationException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserRepository;
@@ -21,9 +20,7 @@ public class UserServiceImpl implements UserService {
     public UserDto add(UserDto user) {
         User userToIns = UserMapper.toUser(user);
 
-        checkEmail(userToIns);
-
-        userToIns = repository.saveAndFlush(UserMapper.toUser(user));
+        userToIns = repository.saveAndFlush(userToIns);
 
         return UserMapper.toUserDto(userToIns);
     }
@@ -55,7 +52,6 @@ public class UserServiceImpl implements UserService {
                 userInBase.get().setName(user.getName());
             }
             if (user.getEmail() != null) {
-                checkEmail(UserMapper.toUser(user));
                 userInBase.get().setEmail(user.getEmail());
             }
             repository.save(userInBase.get());
@@ -80,11 +76,5 @@ public class UserServiceImpl implements UserService {
             ret.add(UserMapper.toUserDto(u));
         }
         return ret;
-    }
-
-    private void checkEmail(User user) {
-        if (user.getEmail() == null) {
-            throw new ValidationException("Email не может быть пустым!");
-        }
     }
 }

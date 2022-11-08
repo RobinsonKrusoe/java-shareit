@@ -5,8 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import ru.practicum.shareit.errorHandle.exception.ValidationException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 /**
  * Контроллер для обработки запросов по вещам
@@ -27,9 +33,19 @@ public class ItemController {
      */
     @PostMapping
     public ResponseEntity<Object> postItem(@RequestHeader("X-Sharer-User-Id") long userId,
-                                           @RequestBody ItemDto item) {
-        log.info("Creating item {}, userId={}", item, userId);
-        return itemClient.add(item, userId);
+                                           @Valid @RequestBody ItemDto itemDto) {
+        log.info("Creating item {}, userId={}", itemDto, userId);
+        if (itemDto.getAvailable() == null) {
+            throw new ValidationException("Не заполнено поле доступности!");
+        }
+        if (itemDto.getName() == null || itemDto.getName().isBlank()) {
+            throw new ValidationException("Не заполнено название вещи!");
+        }
+
+        if (itemDto.getDescription() == null || itemDto.getDescription().isBlank()) {
+            throw new ValidationException("Не заполнено описание вещи!");
+        }
+        return itemClient.add(itemDto, userId);
     }
 
     /**
@@ -60,9 +76,10 @@ public class ItemController {
      * Просмотр владельцем списка всех его вещей с указанием названия и описания для каждой.
      */
     @GetMapping
-    public ResponseEntity<Object> getAllUserItems(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                  @RequestParam(defaultValue = "0",required = false) Integer from,
-                                                  @RequestParam(defaultValue = "10",required = false) Integer size) {
+    public ResponseEntity<Object> getAllUserItems(
+            @RequestHeader("X-Sharer-User-Id") long userId,
+            @PositiveOrZero @RequestParam(defaultValue = "0",required = false) Integer from,
+            @Positive @RequestParam(defaultValue = "10",required = false) Integer size) {
         log.info("getAllUserItems userId={}, from={}, size={}", userId, from, size);
         return itemClient.getAllUserItems(userId, from, size);
     }
@@ -73,9 +90,10 @@ public class ItemController {
      * и система ищет вещи, содержащие этот текст в названии или описании.
      */
     @GetMapping("/search")
-    public ResponseEntity<Object> searchItems(@RequestParam String text,
-                                              @RequestParam(defaultValue = "0",required = false) Integer from,
-                                              @RequestParam(defaultValue = "10",required = false) Integer size) {
+    public ResponseEntity<Object> searchItems(
+            @RequestParam String text,
+            @PositiveOrZero @RequestParam(defaultValue = "0",required = false) Integer from,
+            @Positive @RequestParam(defaultValue = "10",required = false) Integer size) {
         log.info("searchItems text={}, from={}, size={}", text, from, size);
         return itemClient.searchItems(text, from, size);
     }

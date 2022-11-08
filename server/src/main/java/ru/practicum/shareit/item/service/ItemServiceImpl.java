@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+
 import ru.practicum.shareit.errorHandle.exception.AccessForbiddenException;
 import ru.practicum.shareit.errorHandle.exception.EntityNotFoundException;
-import ru.practicum.shareit.errorHandle.exception.ValidationException;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -45,16 +45,6 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto add(ItemDto itemDto, Long userId) {
         User owner = userService.getUser(userId);
-        if (itemDto.getAvailable() == null) {
-            throw new ValidationException("Не заполнено поле доступности!");
-        }
-        if (itemDto.getName() == null || itemDto.getName().isBlank()) {
-            throw new ValidationException("Не заполнено название вещи!");
-        }
-
-        if (itemDto.getDescription() == null || itemDto.getDescription().isBlank()) {
-            throw new ValidationException("Не заполнено описание вещи!");
-        }
 
         Item itemForBase = ItemMapper.toItem(itemDto);
         itemForBase.setOwner(owner);

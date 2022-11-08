@@ -1,7 +1,6 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,10 +20,10 @@ class UserServiceImplDBTest {
     private final EntityManager em;
     private final UserServiceImpl userService;
 
-    @AfterEach
-    void afterEach() {
-        em.createNativeQuery("truncate users restart identity cascade");
-    }
+//    @AfterEach
+//    void afterEach() {
+//        em.createNativeQuery("truncate users restart identity cascade");
+//    }
 
     @Test
     void testAddDB() {

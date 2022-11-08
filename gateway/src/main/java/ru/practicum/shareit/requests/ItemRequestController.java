@@ -7,6 +7,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.requests.dto.ItemRequestDto;
 
+import javax.validation.Valid;
+
 @Slf4j
 @Validated
 @RestController
@@ -21,7 +23,7 @@ public class ItemRequestController {
      */
     @PostMapping
     public ResponseEntity<Object> postItemRequest(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                  @RequestBody ItemRequestDto itemRequest) {
+                                                  @Valid @RequestBody ItemRequestDto itemRequest) {
         log.info("Creating itemRequest {}, userId={}", itemRequest, userId);
         return itemRequestClient.add(itemRequest, userId);
     }

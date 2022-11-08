@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.springframework.data.domain.PageImpl;
 import ru.practicum.shareit.errorHandle.exception.AccessForbiddenException;
 import ru.practicum.shareit.errorHandle.exception.EntityNotFoundException;
-import ru.practicum.shareit.errorHandle.exception.ValidationException;
+//import ru.practicum.shareit.errorHandle.exception.ValidationException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -105,22 +105,31 @@ class ItemServiceImplTest {
 
     @Test
     void add() {
+//        ItemDto itemAddDto = ItemDto.builder()
+//                .id(1L)
+//                .owner(userDto)
+//                .requestId(1L)
+//                .build();
+        //Запрос без поля доступности должен вызывать исключение
+//        assertThrows(ValidationException.class, () -> itemService.add(itemAddDto, 1L));
+//        itemAddDto.setAvailable(true);
+//
+//        //Запрос без названия вещи должен вызывать исключение
+//        assertThrows(ValidationException.class, () -> itemService.add(itemAddDto, 1L));
+//        itemAddDto.setName("Аккумуляторная дрель");
+//
+//        //Запрос без описания вещи должен вызывать исключение
+//        assertThrows(ValidationException.class, () -> itemService.add(itemAddDto, 1L));
+//        itemAddDto.setDescription("Аккумуляторная дрель + аккумулятор");
+
         ItemDto itemAddDto = ItemDto.builder()
                 .id(1L)
                 .owner(userDto)
                 .requestId(1L)
+                .available(true)
+                .name("Аккумуляторная дрель")
+                .description("Аккумуляторная дрель + аккумулятор")
                 .build();
-        //Запрос без поля доступности должен вызывать исключение
-        assertThrows(ValidationException.class, () -> itemService.add(itemAddDto, 1L));
-        itemAddDto.setAvailable(true);
-
-        //Запрос без названия вещи должен вызывать исключение
-        assertThrows(ValidationException.class, () -> itemService.add(itemAddDto, 1L));
-        itemAddDto.setName("Аккумуляторная дрель");
-
-        //Запрос без описания вещи должен вызывать исключение
-        assertThrows(ValidationException.class, () -> itemService.add(itemAddDto, 1L));
-        itemAddDto.setDescription("Аккумуляторная дрель + аккумулятор");
 
         assertEquals(itemAddDto, itemService.add(itemAddDto, 1L));
     }
