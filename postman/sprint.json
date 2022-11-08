@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "42a57a17-8efb-4b8a-ad3c-b9241bf36526",
-		"name": "Sprint 16 ShareIt (add-item-requests)",
+		"_postman_id": "02b3b696-d51d-4750-b4dc-35e6712fd023",
+		"name": "Sprint 17 ShareIt (add-docker)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "2036415"
 	},
@@ -2783,6 +2783,12 @@
 									"pm.test(\"Test create current booking\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.id, '\"id\" field').to.eql(1);",
+									"    pm.expect(jsonData.start, '\"start\" field').to.eql(pm.environment.get('start'));",
+									"    pm.expect(jsonData.end, '\"end\" field').to.eql(pm.environment.get('end'));",
+									"    pm.expect(jsonData.status, '\"status\" field').to.eql('WAITING');",
+									"    pm.expect(jsonData.booker.id, '\"booker.id\" field').to.eql(1);",
+									"    pm.expect(jsonData.item.id, '\"item.id\" field').to.eql(2);",
+									"    pm.expect(jsonData.item.name, '\"item.name\" field').to.eql('Отвертка');",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2853,6 +2859,8 @@
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.id, '\"id\" field').to.eql(1);",
 									"    pm.expect(jsonData.status, '\"status\" field').to.eql('APPROVED');",
+									"    pm.expect(jsonData.start, '\"start\" field').to.eql(pm.environment.get('start'));",
+									"    pm.expect(jsonData.end, '\"end\" field').to.eql(pm.environment.get('end'));",
 									"    pm.expect(jsonData.booker.id, '\"booker.id\" field').to.eql(1);",
 									"    pm.expect(jsonData.item.id, '\"item.id\" field').to.eql(2);",
 									"    pm.expect(jsonData.item.name, '\"item.name\" field').to.eql('Отвертка');",
@@ -2914,6 +2922,12 @@
 									"pm.test(\"Test create booking\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.id, '\"id\" field').to.eql(2);",
+									"    pm.expect(jsonData.start, '\"start\" field').to.eql(pm.environment.get('start'));",
+									"    pm.expect(jsonData.end, '\"end\" field').to.eql(pm.environment.get('end'));",
+									"    pm.expect(jsonData.status, '\"status\" field').to.eql('WAITING');",
+									"    pm.expect(jsonData.booker.id, '\"booker.id\" field').to.eql(1);",
+									"    pm.expect(jsonData.item.id, '\"item.id\" field').to.eql(2);",
+									"    pm.expect(jsonData.item.name, '\"item.name\" field').to.eql('Отвертка');",
 									"});"
 								],
 								"type": "text/javascript"
@@ -5431,7 +5445,7 @@
 					"response": []
 				},
 				{
-					"name": "Add comment to item 2 from user5 failed by future booking",
+					"name": "Add comment to item 1 from user5 failed by future booking",
 					"event": [
 						{
 							"listen": "test",
